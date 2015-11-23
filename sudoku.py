@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import copy
 
-
 class SudokuPuzzle:
 	def __init__(self,puzzle_file):
 		self.puzzle_file = puzzle_file
@@ -34,30 +33,44 @@ class SudokuPuzzle:
 		        break
 		return array
 
-	def get_row(self,row):
+	def get_row(self,row,output='value'):
 		#returns a list of values in the row
+		#specify output='solutions' to return lists of solutions
+		if output == 'solutions':
+			return self.solutions[row]
 		return self.puzzle[row]
 
-	def get_col(self,col):
+	def get_col(self,col,output='value'):
 		#returns a list of values in the col
+		#specify output='solutions' to return lists of solutions
 		column = []
+		if output == 'solutions':
+			for row in range(9):
+				column.append(self.solutions[row][col])
+			return column
 		for row in range(9):
 			column.append(self.puzzle[row][col])
 		return column
 
-	def get_cell(self,row,col):
+	def get_cell(self,row,col,output='value'):
 		#returns a list of values in the cell
 		#automatically determines which cell the value is in
+		#specify output='solutions' to return lists of solutions
 		cell_row = row//3
 		cell_col = col//3
 		cell = []
+		if output == 'solutions':
+			for row in range(cell_row*3,(cell_row*3)+3):
+				for col in range(cell_col*3,(cell_col*3)+3):
+					cell.append(self.solutions[row][col])	
+			return cell
 		for row in range(cell_row*3,(cell_row*3)+3):
 			for col in range(cell_col*3,(cell_col*3)+3):
 				cell.append(self.puzzle[row][col])
 		return cell
 
 	def check_solns(self,row,col):
-		# outputs list of possible solutions for that cell
+		# outputs list of possible solutions for that cell based on found values
 		# checks the row, column, and cell
 		solns = range(1,10)
 		#check row
@@ -66,8 +79,6 @@ class SudokuPuzzle:
 		solns = list(set(solns)-set(self.get_col(col)))
 		#check cell
 		solns = list(set(solns)-set(self.get_cell(row,col)))
-
-		#add check if cell has 8 solutions already
 
 		return solns
 
