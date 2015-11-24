@@ -71,6 +71,7 @@ class SudokuPuzzle:
 
 	def check_solns(self,row,col):
 		# outputs list of possible solutions for that cell based on found values
+
 		# checks the row, column, and cell
 		solns = range(1,10)
 		#check row
@@ -79,6 +80,7 @@ class SudokuPuzzle:
 		solns = list(set(solns)-set(self.get_col(col)))
 		#check cell
 		solns = list(set(solns)-set(self.get_cell(row,col)))
+
 
 		return solns
 
@@ -93,7 +95,10 @@ class SudokuPuzzle:
 					self.solutions[row][col] = self.check_solns(row,col)
 					if len(self.solutions[row][col]) == 1:
 						self.puzzle[row][col] = self.solutions[row][col][0]
+						self.solutions[row][col] = self.solutions[row][col][0]
 						counter += 1
+				elif self.puzzle[row][col]:
+					self.solutions[row][col] = self.puzzle[row][col] #if value is already know, put it in solutions
 				else: continue
 
 		print('Iteration completed, %i new solutions found.' % counter)
@@ -110,6 +115,45 @@ class SudokuPuzzle:
 				pretty_puzzle[(3*i)+j] = [str(zeros).replace('0','_') for zeros in pretty_puzzle[(3*i)+j]]
 				print('| %s %s %s | %s %s %s | %s %s %s |' % tuple(pretty_puzzle[(3*i)+j]))
 			print('.-------.-------.-------.')
+
+	def check_pinned(self,row,col):
+		# checks specified cell for a pinned solution
+		# value is pinned if it is the only solution in that row, col or cell
+		# if value is pinned, self.solutions is updated
+
+		if type(self.solutions[row][col]) is int:
+			print('already known!')
+			return False
+
+		for possible_solution in self.solutions[row][col]:
+			row_solns = [soln for soln in self.get_row(row,output='solutions') if type(soln) is list]
+			occurance = 0 #counter to check how many times solution is present
+			for solutions in row_solns: #check row
+				if possible_solution in solutions:
+					occurance += 1
+			if occurance==1:
+				return possible_solution
+
+			col_solns = [soln for soln in self.get_col(col,output='solutions') if type(soln) is list]
+			occurance = 0 #counter to check how many times solution is present
+			for solutions in col_solns: #check col
+				if possible_solution in solutions:
+					occurance += 1
+			if occurance==1:
+				return possible_solution
+
+			cell_solns = [soln for soln in self.get_cell(row,col,output='solutions') if type(soln) is list]
+			occurance = 0 #counter to check how many times solution is present
+			for solutions in cell_solns: #check cell
+				if possible_solution in solutions:
+					occurance += 1
+			if occurance==1:
+				return possible_solution
+
+		
+		return False
+
+
 
 
 
